@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>إلى حبيبتي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Noto+Naskh+Arabic:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#240c18;--bg2:#4a1a31;--rose:#f2b6b0;--gold:#e8c78a;--ivory:#fdf3ec;--red:#e2566f;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#240c18;--bg2:#4a1a31;--rose:#f2b6b0;--gold:#e8c78a;--ivory:#fdf3ec;--red:#e2566f}}
+:root[data-theme="dark"]{--bg:#240c18;--bg2:#4a1a31;--rose:#f2b6b0;--gold:#e8c78a;--ivory:#fdf3ec;--red:#e2566f}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:radial-gradient(ellipse at 50% 20%,var(--bg2),var(--bg) 75%);color:var(--ivory);font-family:'Noto Naskh Arabic',Georgia,serif;overflow:hidden}
+canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
+#gate{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;background:var(--bg);transition:opacity 1s .6s,visibility 0s 1.6s}
+#gate.gone{opacity:0;visibility:hidden}
+#gate p{font-size:1.2rem;color:var(--rose);transition:opacity .4s}
+#gate.gone p{opacity:0}
+.heart{width:120px;height:120px;border:0;background:none;cursor:pointer;animation:beat 1.4s infinite;transition:transform .8s cubic-bezier(.6,-.3,.4,1.4),opacity .6s .2s}
+.heart svg{width:100%;height:100%;filter:drop-shadow(0 0 22px #e2566f99)}
+.heart:focus-visible{outline:3px solid var(--gold);outline-offset:8px;border-radius:50%}
+.gone .heart{transform:scale(6);opacity:0;animation:none}
+@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.14)}30%{transform:scale(1)}45%{transform:scale(1.09)}}
+#card{position:fixed;inset:0;overflow-y:auto;z-index:2;visibility:hidden;padding:12vh 26px 22vh;text-align:center}
+#card.on{visibility:visible}
+.wrap{max-width:30rem;margin:0 auto;display:flex;flex-direction:column;gap:36px;align-items:center}
+.l{font-size:1.4rem;line-height:2.1;opacity:0;transform:translateY(22px);transition:opacity 1.4s,transform 1.4s}
+.l.show{opacity:1;transform:none}
+.to{font-family:'Aref Ruqaa',serif;font-weight:700;font-size:clamp(2.8rem,13vw,4.4rem);color:var(--rose);text-shadow:0 0 34px #e2566f66}
+.vow{font-family:'Aref Ruqaa',serif;font-size:clamp(1.7rem,7vw,2.3rem);color:var(--gold)}
+.sign{font-family:'Aref Ruqaa',serif;font-size:1.5rem;color:var(--rose)}
+.btn{padding:14px 32px;border:0;border-radius:40px;cursor:pointer;font:600 1.2rem 'Noto Naskh Arabic',serif;background:linear-gradient(135deg,#f6c4bd,var(--red));color:#3a0b19;box-shadow:0 8px 24px #e2566f55}
+.btn:active{transform:scale(.94)}
+.btn:focus-visible{outline:3px solid var(--gold);outline-offset:4px}
+.big{font-family:'Aref Ruqaa',serif;font-weight:700;font-size:clamp(2.6rem,12vw,4rem);color:var(--gold);line-height:1.5}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01s!important;animation:none!important}}
+</style>
+</head>
+<body>
+<canvas id="cv" aria-hidden="true"></canvas>
+
+<div id="gate">
+  <button class="heart" id="go" aria-label="افتحي البطاقة">
+    <svg viewBox="0 0 32 29"><path fill="#e2566f" d="M16 28C-6 13 4-3 16 7 28-3 38 13 16 28Z"/></svg>
+  </button>
+  <p>المسي القلب… هذه البطاقة لكِ</p>
+</div>
+
+<main id="card">
+  <div class="wrap">
+    <h1 class="l to">إلى حبيبتي</h1>
+    <p class="l">في هذا العالم الواسع، بين كل الوجوه والطرق، اخترتُكِ أنتِ.</p>
+    <p class="l">أنتِ البيت الذي يعود إليه قلبي، والهدوء الذي يسكنني بعد كل تعب.</p>
+    <p class="l">كل يومٍ معكِ هدية، وكل نظرةٍ منكِ وطن.</p>
+    <p class="l vow">وعدٌ مني: لن أتركَكِ أبدًا.<br>سأبقى بجانبكِ في الفرح وفي الشدّة، في الضحك وفي الصمت.</p>
+    <p class="l sign">دائمًا لكِ ♥</p>
+    <div class="l"><button class="btn" id="sur">اضغطي هنا 💌</button></div>
+    <p class="l big" id="fin">عمري ما نخليك ❤</p>
+  </div>
+</main>
+
+<script>
+(function(){
+  var cv=document.getElementById('cv'),ctx=cv.getContext('2d'),H_=[],W,H,run=false;
+  var still=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var cols=['#e2566f','#f2b6b0','#e8c78a','#fdf3ec','#c93c5c'];
+  function size(){var r=window.devicePixelRatio||1;W=innerWidth;H=innerHeight;cv.width=W*r;cv.height=H*r;ctx.setTransform(r,0,0,r,0,0)}
+  addEventListener('resize',size);size();
+  function add(x,y,vx,vy){H_.push({x:x,y:y,vx:vx,vy:vy,s:6+Math.random()*12,c:cols[Math.random()*cols.length|0],ph:Math.random()*6.28,a:.35+Math.random()*.5})}
+  function heart(s){ctx.beginPath();ctx.moveTo(0,s*.35);ctx.bezierCurveTo(-s,-s*.3,-s*.5,-s,0,-s*.45);ctx.bezierCurveTo(s*.5,-s,s,-s*.3,0,s*.35);ctx.fill()}
+  function rise(){if(H_.length<34&&Math.random()<.12)add(Math.random()*W,H+20,0,-(.6+Math.random()*1.2))}
+  function burst(n){for(var i=0;i<n;i++){var a=-Math.PI/2+(Math.random()-.5)*2.6,v=5+Math.random()*9;add(W/2,H*.75,Math.cos(a)*v,Math.sin(a)*v)}}
+  function tick(){
+    ctx.clearRect(0,0,W,H);rise();
+    for(var i=H_.length-1;i>=0;i--){var p=H_[i];
+      p.vx*=.985;if(p.vy<-1.6)p.vy*=.97;else if(p.vy>-.5&&p.vy<0)p.vy-=.01;
+      p.vy+=.012;p.ph+=.03;p.x+=p.vx+Math.sin(p.ph)*.6;p.y+=p.vy;
+      if(p.y<-30||p.y>H+40){H_.splice(i,1);continue}
+      ctx.save();ctx.translate(p.x,p.y);ctx.fillStyle=p.c;ctx.globalAlpha=p.a;heart(p.s);ctx.restore();
+    }
+    requestAnimationFrame(tick)
+  }
+  function start(){if(!run&&!still){run=true;tick()}}
+  var gate=document.getElementById('gate'),card=document.getElementById('card'),L=[].slice.call(document.querySelectorAll('.l'));
+  var fin=document.getElementById('fin'),btnWrap=document.getElementById('sur').parentNode;
+  var seq=L.filter(function(e){return e!==fin});
+  function reveal(i){
+    if(i>=seq.length)return;
+    seq[i].classList.add('show');
+    seq[i].scrollIntoView({behavior:still?'auto':'smooth',block:'center'});
+    setTimeout(function(){reveal(i+1)},still?50:i===0?1600:2600);
+  }
+  document.getElementById('go').addEventListener('click',function(){
+    gate.classList.add('gone');card.classList.add('on');start();
+    if(!still)setTimeout(function(){burst(50)},600);
+    setTimeout(function(){reveal(0)},900);
+  });
+  document.getElementById('sur').addEventListener('click',function(){
+    start();if(!still)burst(110);
+    fin.classList.add('show');
+    fin.scrollIntoView({behavior:still?'auto':'smooth',block:'center'});
+  });
+})();
+</script>
+</body>
+</html>
